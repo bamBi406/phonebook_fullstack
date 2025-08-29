@@ -1,0 +1,17 @@
+# Ignorer node_modules dans backend et frontend
+/backend/node_modules/
+/frontend/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environnement
+**/.env
+
+# Dossiers de build frontend
+/frontend/dist/
+/frontend/build/
+
