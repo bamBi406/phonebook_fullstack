@@ -60,10 +60,10 @@ app.get('/info', (request, response) => {
     `)
 })
 
-app.delete('/api/persons/:id', (req, res, next) => {
+app.delete('/api/persons/:id', (req, response, next) => {
     Person.findByIdAndDelete(req.params.id)
         .then(res => {
-            res.status(204).end()
+            response.status(204).end()
         })
         .catch(error => next(error))
 })
