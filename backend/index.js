@@ -51,13 +51,14 @@ app.get('/api/persons/:id', (req, res) =>{
 })
 
 app.get('/info', (request, response) => {
-    const entries = persons.length
-    const now = new Date()
-
-    response.send(`
-        <p>Phonebook has info for ${entries} people</p>
-        <p>${now}</p>
-    `)
+    Person.countDocuments({})
+    .then(count => {
+        const now = new Date()
+        response.send(`
+            <p>Phonebook has info for ${count} people</p>
+            <p>${now}</p>
+        `)
+    })
 })
 
 app.delete('/api/persons/:id', (req, response, next) => {
@@ -68,7 +69,7 @@ app.delete('/api/persons/:id', (req, response, next) => {
         .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
 
     if (!body.name || !body.number) {
@@ -77,27 +78,33 @@ app.post('/api/persons', (req, res) => {
         })
     }
 
-/*     if (persons.some(pers => pers.name === body.name)) {
-        return res.status(400).json({
-            error: 'duplicate name'
+    Person.findOne({ name: body.name })
+        .then(existingPerson => {
+            if (existingPerson) {
+                Person.findByIdAndUpdate(
+                    existingPerson._id,
+                    { number: body.number },
+                    { new: true }
+                )
+                .then(updatedPerson => {
+                    res.json(updatedPerson)
+                })
+                .catch(error => next(error))
+            }else {
+                const person = new Person({
+                    name: body.name,
+                    number: body.number
+                })
+                person.save()
+                    .then(savedPerson => {
+                        res.json(savedPerson)
+                    })
+                    .catch(error => next(error))
+            }
         })
-    }
-
-    if (persons.some(p => p.id === id)) {
-        return res.status(400).json({
-            error: 'incorrect id'
-        })
-    } */
-
-    const person = new Person({
-        name: body.name,
-        number: body.number
-    })
-
-    person.save().then(savedPerson => {
-        res.json(savedPerson)
-    })
+        .catch(error => next(error))
 })
+
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
