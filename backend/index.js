@@ -38,16 +38,24 @@ app.get('/', (request, response) => {
     response.send('toto')
 })
 
-app.get('/api/persons', (request, response) => {
-    Person.find({}).then(persons => {
-        response.json(persons)
-    })
+app.get('/api/persons', (request, response, next) => {
+    Person.find({})
+        .then(persons => {
+            response.json(persons)
+        })
+        .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) =>{
-    Person.findById(req.params.id).then(person => {
-        res.json(person)
-    })
+app.get('/api/persons/:id', (req, res, next) =>{
+    Person.findById(req.params.id)
+        .then(person => {
+            if (!person) {
+                response.status(404).end()
+            } else {
+                res.json(person)
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
@@ -81,16 +89,8 @@ app.post('/api/persons', (req, res, next) => {
     Person.findOne({ name: body.name })
         .then(existingPerson => {
             if (existingPerson) {
-                Person.findByIdAndUpdate(
-                    existingPerson._id,
-                    { number: body.number },
-                    { new: true }
-                )
-                .then(updatedPerson => {
-                    res.json(updatedPerson)
-                })
-                .catch(error => next(error))
-            }else {
+                return res.status(400).json({ error : 'name is already in DB'})
+             }else {
                 const person = new Person({
                     name: body.name,
                     number: body.number
@@ -104,6 +104,25 @@ app.post('/api/persons', (req, res, next) => {
         })
         .catch(error => next(error))
 })
+
+app.put('/api/persons/:id', (req, res, next) => {
+    const { name, number } = req.body
+
+    Person.findByIdAndUpdate(
+        req.params.id,
+        { name, number },
+        { new: true, runValidators: true, context: 'query' }
+    )
+    .then(updatedPerson => {
+        if (updatedPerson) {
+            res.json(updatedPerson)
+        } else {
+            res.status(404).json({ error: 'person not found' })
+        }
+    })
+    .catch(error => next(error))
+})
+
 
 
 const unknownEndpoint = (request, response) => {
