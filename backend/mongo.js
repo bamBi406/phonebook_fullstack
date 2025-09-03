@@ -31,7 +31,7 @@ if (process.argv[3] && process.argv[4]) {
         number
     })
 
-    person.save().then(res => {
+    person.save().then(() => {
         console.log(`added ${name} ${number}`)
         mongoose.connection.close()
     })

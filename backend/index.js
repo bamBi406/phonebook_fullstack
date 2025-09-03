@@ -48,7 +48,7 @@ app.get('/api/persons', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res, next) =>{
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
         .then(person => {
             if (!person) {
@@ -62,13 +62,13 @@ app.get('/api/persons/:id', (req, res, next) =>{
 
 app.get('/info', (request, response) => {
     Person.countDocuments({})
-    .then(count => {
-        const now = new Date()
-        response.send(`
-            <p>Phonebook has info for ${count} people</p>
-            <p>${now}</p>
-        `)
-    })
+        .then(count => {
+            const now = new Date()
+            response.send(`
+                <p>Phonebook has info for ${count} people</p>
+                <p>${now}</p>
+            `)
+        })
 })
 
 app.delete('/api/persons/:id', (req, response, next) => {
@@ -85,8 +85,8 @@ app.post('/api/persons', (req, res, next) => {
     Person.findOne({ name: body.name })
         .then(existingPerson => {
             if (existingPerson) {
-                return res.status(400).json({ error : 'name is already in DB'})
-             }else {
+                return res.status(400).json({ error : 'name is already in DB' })
+            }else {
                 const person = new Person({
                     name: body.name,
                     number: body.number
@@ -109,20 +109,20 @@ app.put('/api/persons/:id', (req, res, next) => {
         { name, number },
         { new: true, runValidators: true, context: 'query' }
     )
-    .then(updatedPerson => {
-        if (updatedPerson) {
-            res.json(updatedPerson)
-        } else {
-            res.status(404).json({ error: 'person not found' })
-        }
-    })
-    .catch(error => next(error))
+        .then(updatedPerson => {
+            if (updatedPerson) {
+                res.json(updatedPerson)
+            } else {
+                res.status(404).json({ error: 'person not found' })
+            }
+        })
+        .catch(error => next(error))
 })
 
 
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+    response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
