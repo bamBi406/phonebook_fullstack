@@ -25,6 +25,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformated id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)
@@ -79,12 +81,6 @@ app.delete('/api/persons/:id', (req, response, next) => {
 
 app.post('/api/persons', (req, res, next) => {
     const body = req.body
-
-    if (!body.name || !body.number) {
-        return res.status(400).json({
-            error: 'content missing'
-        })
-    }
 
     Person.findOne({ name: body.name })
         .then(existingPerson => {
