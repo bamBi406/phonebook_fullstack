@@ -87,6 +87,12 @@ const addName = (event) => {
       })
       .catch(error => {
         console.error(error)
+        setNewError(
+            `${error.response.data.error}`
+          )
+          setTimeout(() => {
+            setNewError(null)
+          }, 3000)
       })
   }
 }

@@ -52,7 +52,7 @@ app.get('/api/persons/:id', (req, res, next) =>{
     Person.findById(req.params.id)
         .then(person => {
             if (!person) {
-                response.status(404).end()
+                res.status(404).end()
             } else {
                 res.json(person)
             }
@@ -73,7 +73,7 @@ app.get('/info', (request, response) => {
 
 app.delete('/api/persons/:id', (req, response, next) => {
     Person.findByIdAndDelete(req.params.id)
-        .then(res => {
+        .then(() => {
             response.status(204).end()
         })
         .catch(error => next(error))
