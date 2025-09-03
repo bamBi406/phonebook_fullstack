@@ -60,7 +60,8 @@ const addName = (event) => {
             setNewNotification(null)
           }, 3000)
         })
-        .catch(e => {
+        .catch(error => {
+          console.log(error)
           setNewError(
             `Information of ${newName} has already been removed from server`
           )
@@ -123,7 +124,8 @@ const addName = (event) => {
             setNewNotification(null)
           }, 3000)
         })
-        .catch( e => {
+        .catch(error => {
+          console.log(error)
           setNewError(`${name} was already removed from server`)
           setTimeout(() => {
             setNewError(null)
